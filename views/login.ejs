@@ -2,16 +2,16 @@
         <div class="col-md-6 m-auto">
           <div class="card card-body">
             <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i>  Login</h1>
-           
+            <%-include('./partials/messages.ejs');-%>
             <form action="/users/login" method="POST">
               <div class="form-group">
-                <label for="rollno.">Roll No.</label>
+                <label for="rollno.">Email</label>
                 <input
-                  type="rollno."
-                  id="rollno."
-                  name="rollno."
+                  type="email"
+                  id="email"
+                  name="email"
                   class="form-control"
-                  placeholder="Enter Roll No."
+                  placeholder="Enter Email"
                 />
               </div>
               <div class="form-group">
