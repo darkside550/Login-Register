@@ -4,7 +4,7 @@
             <h1 class="text-center mb-3">
               <i class="fas fa-user-plus"></i> Register
             </h1>
-            
+            <%-include('./partials/messages.ejs');-%>
             <form action="/users/register" method="POST">
               <div class="form-group">
                 <label for="name">Name</label>
@@ -18,11 +18,11 @@
                 />
                 <form action="/users/register" method="POST">
                     <div class="form-group">
-                      <label for="rollno.">Roll No.</label>
+                      <label for="rollno">Roll No.</label>
                       <input
-                        type="rollno."
-                        id="rollno."
-                        name="rollno."
+                        type="rollno"
+                        id="rollno"
+                        name="rollno"
                         class="form-control"
                         placeholder="Enter Roll No."
                         value="<%= typeof rollno != 'undefined' ? rollno : '' %>"
