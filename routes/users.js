@@ -17,7 +17,10 @@ router.get('/login',(req,res) => res.render('login'));
 router.get('/register',(req,res) => res.render('register'));
 
 // Forget Page
-router.get('/forgetpassword',(req,res) => res.render('forgetpassword'));
+router.get('/forgot',(req,res) => res.render('forgot'));
+
+//reset page
+//router.get('/users/reset/<%= token %>',(req,res) => res.render('reset/<%= token %>'));
 
 // Register handle
 router.post('/register', (req,res) => {
@@ -98,10 +101,17 @@ router.post('/login', (req,res,next) => {
     })(req,res,next);
 });
 
-//forget password
-router.get('/forgetpassword',(req,res) => res.render('forgetpassword'));
+//logout handle
+router.get('/logout',(req,res) => {
+    req.logOut();
+    req.flash('success_msg', 'you are logged out');
+    res.redirect('/users/login');
+});
 
-router.post('/forgetpassword', function(req, res, next) {
+//forget password
+router.get('/forgot',(req,res) => res.render('forgot'));
+
+router.post('/forgot', function(req, res, next) {
     async.waterfall([
       function(done) {
         crypto.randomBytes(20, function(err, buf) {
@@ -113,7 +123,7 @@ router.post('/forgetpassword', function(req, res, next) {
         User.findOne({ email: req.body.email }, function(err, user) {
           if (!user) {
             req.flash('error_msg', 'No account with that email address exists');
-            return res.redirect('/users/forgetpassword');
+            return res.redirect('/users/forgot');
           }
   
           user.resetPasswordToken = token;
@@ -126,7 +136,7 @@ router.post('/forgetpassword', function(req, res, next) {
       },
       function(token, user, done) {
         var smtpTransport = nodemailer.createTransport({
-          service: 'gmail', 
+          service: 'Gmail', 
           auth: {
             user: process.env.EMAIL,
             pass: process.env.PASSWORD
@@ -138,7 +148,7 @@ router.post('/forgetpassword', function(req, res, next) {
           subject: 'Node.js Password Reset',
           text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
             'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-            'http://' + req.headers.host + '/users/resetpassword/' + token + '\n\n' +
+            'http://' + req.headers.host + '/users/reset/' + token + '\n\n' +
             'If you did not request this, please ignore this email and your password will remain unchanged.\n'
         };
         smtpTransport.sendMail(mailOptions, function(err) {
@@ -149,28 +159,21 @@ router.post('/forgetpassword', function(req, res, next) {
       }
     ], function(err) {
       if (err) return next(err);
-      res.redirect('/users/forgetpassword');
+      res.redirect('/users/forgot');
     });
   });
 
-//logout handle
-router.get('/logout',(req,res) => {
-    req.logOut();
-    req.flash('success_msg', 'you are logged out');
-    res.redirect('/users/login');
-});
-
-router.get('/users/resetpassword/:token', function(req, res) {
+router.get('/users/reset/:token', function(req, res) {
   User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
     if (!user) {
       req.flash('error', 'Password reset token is invalid or has expired.');
-      return res.redirect('/users/forgetpassword');
+      return res.redirect('/users/forgot');
     }
-    res.render('/users/resetpassword', {token: req.params.token});
+    res.render('/users/reset', {token: req.params.token});
   });
 });
 
-router.post('/users/resetpassword/:token', function(req, res) {
+router.post('/users/reset/:token', function(req, res) {
   async.waterfall([
     function(done) {
       User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
@@ -197,7 +200,7 @@ router.post('/users/resetpassword/:token', function(req, res) {
     },
     function(user, done) {
       var smtpTransport = nodemailer.createTransport({
-        service: 'gmail', 
+        service: 'Gmail', 
         auth: {
           user: process.env.EMAIL,
           pass: process.env.PASSWORD
@@ -216,7 +219,7 @@ router.post('/users/resetpassword/:token', function(req, res) {
       });
     }
   ], function(err) {
-    res.redirect('/campgrounds');
+    res.redirect('/login');
   });
 });
 

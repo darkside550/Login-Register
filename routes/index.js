@@ -11,5 +11,6 @@ router.get('/dashboard',ensureAuthenticated, (req,res) =>
         name: req.user.name
     }));
 
+//reset password    
 
 module.exports = router;
