@@ -1,2 +1,2 @@
-# collegeBuddy-2.0
+# Login-Registration
 for codebreak
